@@ -36,7 +36,7 @@ module Ancestry
         if ancestry_changed? && !new_record? && sane_ancestry?
           update_sql = <<-SQL
           update %{table}
-          set ancestry = replace(ancestry, '%{old_ancestry}', '%{new_ancestry}')
+          set ancestry = regexp_replace(ancestry, '^%{old_ancestry}', '%{new_ancestry}')
           where %{condition}
           SQL
           sql_params = {
