@@ -35,11 +35,12 @@ module Ancestry
         # If node is not a new record and ancestry was updated and the new ancestry is sane ...
         if ancestry_changed? && !new_record? && sane_ancestry?
           update_sql = <<-SQL
-          update members
+          update %{table}
           set ancestry = replace(ancestry, '%{old_ancestry}', '%{new_ancestry}')
           where %{condition}
           SQL
           sql_params = {
+              table: get_arel_table.name,
               condition: descendant_conditions.to_sql,
               old_ancestry: self.child_ancestry,
               new_ancestry: read_attribute(self.class.ancestry_column).blank? ? id.to_s : "#{read_attribute self.class.ancestry_column }/#{id}"
