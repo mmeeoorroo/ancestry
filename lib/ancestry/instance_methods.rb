@@ -45,12 +45,7 @@ module Ancestry
               old_ancestry: self.child_ancestry,
               new_ancestry: read_attribute(self.class.ancestry_column).blank? ? id.to_s : "#{read_attribute self.class.ancestry_column }/#{id}"
           }
-          sql = update_sql % sql_params
-          puts '-'*100
-          puts sql
-          puts '-'*100
-
-          ActiveRecord::Base.connection.execute(sql)
+          ActiveRecord::Base.connection.execute(update_sql % sql_params)
         end
       end
     end
