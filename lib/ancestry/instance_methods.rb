@@ -28,6 +28,32 @@ module Ancestry
       end
     end
 
+    # Update descendants with new ancestry using sql `update` command
+    def update_descendants_with_new_ancestry_sql
+      # Skip this if callbacks are disabled
+      unless ancestry_callbacks_disabled?
+        # If node is not a new record and ancestry was updated and the new ancestry is sane ...
+        if ancestry_changed? && !new_record? && sane_ancestry?
+          update_sql = <<-SQL
+          update members
+          set ancestry = replace(ancestry, '%{old_ancestry}', '%{new_ancestry}')
+          where %{condition}
+          SQL
+          sql_params = {
+              condition: descendant_conditions.to_sql,
+              old_ancestry: self.child_ancestry,
+              new_ancestry: read_attribute(self.class.ancestry_column).blank? ? id.to_s : "#{read_attribute self.class.ancestry_column }/#{id}"
+          }
+          sql = update_sql % sql_params
+          puts '-'*100
+          puts sql
+          puts '-'*100
+
+          ActiveRecord::Base.connection.execute(sql)
+        end
+      end
+    end
+
     # Apply orphan strategy
     def apply_orphan_strategy
       # Skip this if callbacks are disabled

@@ -47,7 +47,7 @@ class << ActiveRecord::Base
     scope :ordered_by_ancestry_and, lambda { |order| reorder("(case when #{table_name}.#{ancestry_column} is null then 0 else 1 end), #{table_name}.#{ancestry_column}, #{order}") }
 
     # Update descendants with new ancestry before save
-    before_save :update_descendants_with_new_ancestry
+    before_save :update_descendants_with_new_ancestry_sql
 
     # Apply orphan strategy before destroy
     before_destroy :apply_orphan_strategy
